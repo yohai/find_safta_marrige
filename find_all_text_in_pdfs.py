@@ -39,5 +39,7 @@ def get_all_text(pdf_path):
         # Append the text to the list
         ocr_text_per_page.append(text)
 
+    return ocr_text_per_page
+
 all_text = {pdf_path: get_all_text(pdf_path) for pdf_path in glob('source_pdfs/*.pdf')}
 json.dump(all_text, open('all_text.json', 'w'))
