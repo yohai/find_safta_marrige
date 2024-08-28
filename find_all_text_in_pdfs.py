@@ -1,8 +1,11 @@
 '''
-Finds all text in all pdfs in the source_pdfs directory and saves it to a json file all_text.json.
+Finds all text in all pdfs in the source_pdfs directory and saves it to 
+one json file per pdf at `found txt/*.json`
 
 Uses tesseract OCR.
 '''
+
+#%%
 
 import fitz  # PyMuPDF
 import pytesseract
@@ -11,11 +14,9 @@ import io
 import tqdm 
 from glob import glob
 import json
+import os
 
-
-# Path to your PDF file
-pdf_path = 'source_pdfs/אסא.pdf'
-
+out_dir = 'found txt'
 
 def get_all_text(pdf_path):
     # Open the PDF file
@@ -25,7 +26,7 @@ def get_all_text(pdf_path):
     ocr_text_per_page = []
 
     # Iterate over each page in the PDF
-    for page_num in tqdm.tqdm(range(len(pdf_document))):
+    for page_num in tqdm.tqdm(range(len(pdf_document)), desc='file '+os.path.basename(pdf_path)):
         # Get the page
         page = pdf_document.load_page(page_num)
 
@@ -39,7 +40,12 @@ def get_all_text(pdf_path):
         # Append the text to the list
         ocr_text_per_page.append(text)
 
+    json.dump(ocr_text_per_page,
+              open(os.path.join(out_dir, os.path.basename(pdf_path).replace('.pdf', '.json')), 'w')
+              )
+    
     return ocr_text_per_page
 
-all_text = {pdf_path: get_all_text(pdf_path) for pdf_path in glob('source_pdfs/*.pdf')}
-json.dump(all_text, open('all_text.json', 'w'))
+
+all_text = {pdf_path: get_all_text(pdf_path) 
+            for pdf_path in  glob('source_pdfs/*.pdf')}
